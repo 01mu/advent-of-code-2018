@@ -18,18 +18,16 @@ int main()
     FILE * fp = fopen("input", "r");
 
     char line[255];
-    int str_total = 1;
+    int str_total = 0;
     char ** strings = malloc(sizeof(char *));
 
     while(fgets(line, 255, fp) != NULL)
     {
-        strings[str_total - 1] = malloc(sizeof(char) * strlen(line) - 1);
+        strings[str_total] = malloc(sizeof(char) * strlen(line) - 1);
         line[strlen(line) - 1] = '\0';
-        strcpy(strings[str_total - 1], line);
-        strings = realloc(strings, sizeof(char *) * ++str_total);
+        strcpy(strings[str_total], line);
+        strings = realloc(strings, sizeof(char *) * ++str_total + 1);
     }
-
-    --str_total;
 
     find_prod(strings, str_total);
     find_diff(strings, str_total);
@@ -124,7 +122,7 @@ void free_strings(char ** strings, int str_total)
 {
     int i;
 
-    for(i = 0; i < str_total + 1; i++)
+    for(i = 0; i < str_total; i++)
     {
         free(strings[i]);
     }
@@ -134,9 +132,11 @@ void free_strings(char ** strings, int str_total)
 
 int count_str(char ch, char * str)
 {
+    int i;
+
     int count = 0;
 
-    for(int i = 0; i < strlen(str); i++)
+    for(i = 0; i < strlen(str); i++)
     {
         if(str[i] == ch)
         {
