@@ -25,8 +25,12 @@ struct Cut
     int bottom_max;
     int right_max;
 
-    int * occupied;
+    int * occupied_int;
+
+    struct Map * occupied;
     int occupied_count;
+
+    int overlap;
 };
 
 struct Cut * get_cut(char * line);
@@ -35,9 +39,14 @@ void assign(struct Cut ** cuts, int cut_total);
 int get_start(int y_start, int x_start);
 void find_occupied(struct Cut ** cuts, int cut_total);
 void find_overlap(struct Cut ** cuts, int cut_total);
+void find_overlap_prev(struct Cut ** cuts, int cut_total, int occ);
+void free_cuts(struct Cut ** cuts, int cut_total);
 
 int main()
 {
+    int i;
+    int j;
+
     FILE * fp = fopen("input", "r");
 
     char line[255];
@@ -53,6 +62,42 @@ int main()
     assign(cuts, cut_total);
     find_occupied(cuts, cut_total);
     find_overlap(cuts, cut_total);
+
+    for(i = 0; i < cut_total; i++)
+    {
+        if(cuts[i]->overlap == 0)
+        {
+            printf("(B): %i\n", cuts[i]->id);
+        }
+    }
+
+    free_cuts(cuts, cut_total);
+}
+
+void free_cuts(struct Cut ** cuts, int cut_total)
+{
+    int i;
+
+    for(i = 0; i < cut_total; i++)
+    {
+        free(cuts[i]);
+    }
+
+    free(cuts);
+}
+
+void find_overlap_prev(struct Cut ** cuts, int cut_total, int occ)
+{
+    int i;
+    int j;
+
+    for(i = 0; i < cut_total; i++)
+    {
+        if(search(occ, cuts[i]->occupied))
+        {
+            cuts[i]->overlap = 1;
+        }
+    }
 }
 
 void find_overlap(struct Cut ** cuts, int cut_total)
@@ -65,20 +110,20 @@ void find_overlap(struct Cut ** cuts, int cut_total)
     struct Map pos;
     struct MapItem * tm;
 
-    init_map(&pos, 15000);
+    init_map(&pos, BOARD_MAX_X);
 
     for(i = 0; i < cut_total; i++)
     {
         for(j = 0; j < cuts[i]->occupied_count; j++)
         {
-            occ = cuts[i]->occupied[j];
-
+            occ = cuts[i]->occupied_int[j];
             tm = search(occ, &pos);
 
             if(tm)
             {
                 if(tm->data == 1)
                 {
+                    find_overlap_prev(cuts, cut_total, occ);
                     total++;
                 }
 
@@ -108,6 +153,9 @@ void find_occupied(struct Cut ** cuts, int cut_total)
 
     for(i = 0; i < cut_total; i++)
     {
+        struct Map * map = malloc(sizeof(struct Map));
+        init_map(map, cuts[i]->x_dim * cuts[i]->y_dim);
+
         bm = cuts[i]->bottom_max;
 
         while(bm >= cuts[i]->start)
@@ -121,6 +169,8 @@ void find_occupied(struct Cut ** cuts, int cut_total)
                 n++;
                 total++;
 
+                insert(pos, pos, map);
+
                 occupied[oc++] = pos;
                 occupied = realloc(occupied, sizeof(int) * total + 1);
             }
@@ -130,9 +180,10 @@ void find_occupied(struct Cut ** cuts, int cut_total)
         }
 
         cuts[i]->occupied_count = total;
+        cuts[i]->occupied = map;
 
-        cuts[i]->occupied = malloc(total * sizeof(int));
-        memcpy(cuts[i]->occupied, occupied, total * sizeof(int));
+        cuts[i]->occupied_int = malloc(total * sizeof(int));
+        memcpy(cuts[i]->occupied_int, occupied, total * sizeof(int));
 
         occupied = realloc(occupied, sizeof(int));
 
@@ -156,6 +207,7 @@ void assign(struct Cut ** cuts, int cut_total)
 
         cuts[i]->bottom_max = start + (BOARD_MAX_X * (cuts[i]->y_dim - 1));
         cuts[i]->right_max = start + (cuts[i]->x_dim - 1);
+        cuts[i]->overlap = 0;
     }
 }
 
