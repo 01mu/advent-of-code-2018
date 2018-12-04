@@ -35,7 +35,7 @@ int * guard_ids;
 
 int main()
 {
-    FILE * fp = fopen("input", "r");
+    FILE * fp = fopen("bigboy4", "r");
 
     char line[255];
     int input_count = 0;
