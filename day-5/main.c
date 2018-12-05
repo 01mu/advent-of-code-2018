@@ -10,8 +10,6 @@
 int find_shortest(char * input);
 char * rem_ch(char rem, char * input);
 
-#define INPUT #include input
-
 int main()
 {
     FILE * fp = fopen("input", "r");
@@ -21,27 +19,22 @@ int main()
     int res;
 
     char * input_copy;
-    char * new_rem;
 
-    char line[70000];
-    char * input = malloc(sizeof(char) * 70000);
+    char line[50002];
+    char * input = malloc(sizeof(char) * 50002);
 
-    while(fgets(line, 70000, fp) != NULL)
-    {
-        input = line;
-    }
+    fgets(line, 50002, fp);
+    strcpy(input, line);
 
     input[strlen(input) - 1] = '\0';
-
     input_copy = malloc(sizeof(char) * strlen(input) + 1);
 
     printf("(A): %i\n", find_shortest(input));
 
-    strcpy(input_copy, input);
-
     for(i = 97; i < 123; i++)
     {
         strcpy(input_copy, input);
+
         res = find_shortest(rem_ch(i, input_copy));
 
         if(res < min)
@@ -49,6 +42,9 @@ int main()
             min = res;
         }
     }
+
+    free(input);
+    free(input_copy);
 
     printf("(B): %i\n", min);
 }
@@ -110,7 +106,7 @@ char * rem_ch(char rem, char * input)
     {
         ch = input[i];
 
-        if(ch == rem || ch == (rem - 32))
+        if(ch == rem || ch == rem - 32)
         {
             z = i;
 
