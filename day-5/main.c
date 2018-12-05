@@ -10,6 +10,8 @@
 int find_shortest(char * input);
 char * rem_ch(char rem, char * input);
 
+#define INPUT #include input
+
 int main()
 {
     FILE * fp = fopen("input", "r");
@@ -33,9 +35,9 @@ int main()
 
     input_copy = malloc(sizeof(char) * strlen(input) + 1);
 
-    strcpy(input_copy, input);
+    printf("(A): %i\n", find_shortest(input));
 
-    printf("(A): %i\n", find_shortest(input_copy));
+    strcpy(input_copy, input);
 
     for(i = 97; i < 123; i++)
     {
