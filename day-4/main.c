@@ -35,7 +35,7 @@ int * guard_ids;
 
 int main()
 {
-    FILE * fp = fopen("bigboy4", "r");
+    FILE * fp = fopen("input", "r");
 
     char line[255];
     int input_count = 0;
@@ -51,8 +51,11 @@ int main()
     }
 
     guard_ids = malloc(sizeof(int));
+
     qsort(inputs, input_count, sizeof(inputs[0]), cmp);
+
     init_map_t(&guards, input_count);
+
     tokenize_input(inputs, input_count, &guards);
     get_sleepy(&guards);
 }
@@ -85,13 +88,14 @@ char * strstr_new(char * str, int begin)
 
 void tokenize_input(char ** inputs, int input_count, struct Map_t * guards)
 {
-    for(int i = 0; i < input_count; i++)
+    int i;
+    int j = 0;
+
+    char * q;
+    char * list[4];
+
+    for(i = 0; i < input_count; i++)
     {
-        int j = 0;
-
-        char * q;
-        char * list[4];
-
         q = strtok(inputs[i], " ");
 
         while(q != NULL)
@@ -107,6 +111,8 @@ void tokenize_input(char ** inputs, int input_count, struct Map_t * guards)
         }
 
         assign(list, guards);
+
+        j = 0;
     }
 }
 
@@ -191,10 +197,11 @@ void get_sleepy(struct Map_t * guards)
     int winner_b;
 
     int most_sleepy = 0;
-    int most_sleepy_id;
 
     struct Map seconds;
     struct MapItem_t * tm;
+
+    struct MapItem * itm;
 
     int total;
 
@@ -216,7 +223,7 @@ void get_sleepy(struct Map_t * guards)
 
             for(int z = sleep; z < wake; z++)
             {
-                struct MapItem * itm = search(z, &seconds);
+                itm = search(z, &seconds);
 
                 if(itm)
                 {
@@ -228,7 +235,6 @@ void get_sleepy(struct Map_t * guards)
                         largest_sec = itm->data;
                         winner = z;
                         largest_id = guard_ids[i];
-                        most_sleepy_id  = guard_ids[i];
                     }
 
                     if(itm->data > largest_sec_b)
