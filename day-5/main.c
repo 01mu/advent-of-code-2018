@@ -12,19 +12,15 @@ char * rem_ch(char rem, char * input);
 
 int main()
 {
-    FILE * fp = fopen("input", "r");
-
     int i;
     int min = 1000000;
     int res;
 
     char * input_copy;
 
-    char line[50002];
     char * input = malloc(sizeof(char) * 50002);
 
-    fgets(line, 50002, fp);
-    strcpy(input, line);
+    fgets(input, 50002, fopen("input", "r"));
 
     input[strlen(input) - 1] = '\0';
     input_copy = malloc(sizeof(char) * strlen(input) + 1);
